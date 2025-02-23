@@ -12,6 +12,7 @@ console.log(inpGuess);
 const lblHighscore = document.querySelector(".highscore")
 const btnCheck = document.querySelector(".check")
 const btnAgain = document.querySelector(".again")
+const fanfareSounds = document.getElementById("fanfare")
 
 
 let secretNumber = Math.floor(Math.random() * 20 + 1)
@@ -22,21 +23,52 @@ console.log("Secret Number:", secretNumber)
 
 function testNumber(){
     console.log("testNumber")
-    guess = inpGuess.value
-    console.log(inpGuess.value)
+    const guess = Number(inpGuess.value)
+    console.log("Guess:", guess)
 
     if(!guess){
-        lblMessage.textContent = "Wrong Number"
+        lblMessage.textContent = "Wrong Number!"
     } else if (guess === secretNumber){
-        lblMessage.textContent = '?? You have Guessed the Number'
-        youWin()
-    } else if (guess < secretNumber){
-        lblMessage.textContent = 'Too Low'
-    } else if (guess > secretNumber){
-        lblMessage.textContent = 'Too High'
+        lblMessage.textContent = "You have Guessed the Number!"
+
+        lblNumber.textContent = secretNumber
+
+        fanfareSounds.play()
+
+        if(score > highscore) {
+            highscore = score
+            lblHighscore.textContent = highscore
+        }
+
+        inpGuess.disabled = true
+        btnCheck.disabled = true
+
+    } else if (guess !== secretNumber){
+        if(score > 1){
+            lblMessage.textContent = guess > secretNumber ? inpGuess.value + " Too High!" : inpGuess.value + " Too Low!"
+            inpGuess.value = " "
+            score --
+            lblScore.textContent = score
+        } else {
+            lblMessage("You Lost!")
+            lblScore.textContent = 0
+            inpGuess.disabled = true
+            btnCheck.disabled = true
+        }
+
     }
 }
-function youWin(){
-    console.log("You Win!")
-    lblNumber.textContent = secretNumber
+
+function resetGame(){
+    score = 20
+    secretNumber = Math.floor(Math.random() * 20 + 1)
+    lblMessage.textContent = "Start making guesses"
+    lblScore.textContent = score
+    lblNumber.textContent = "?"
+    inpGuess.value = ""
+    inpGuess.disabled = false
+    btnCheck.disabled = false
 }
+
+btnAgain.addEventListener("click", resetGame)
+btnCheck.addEventListener("click", testNumber)
